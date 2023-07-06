@@ -39,25 +39,37 @@ poke_outs = []
 for loom_num, timestamp in enumerate(import_data['Loom TS']):
     # get index of ethovision time closest to manual timestamp
     loom_time_idx = np.where(np.array(import_data['Time']) >= timestamp)[0][0]
-   
+    
     # get index of first location switch after loom and confirm is from detected to undetected
-    shelter_start_idx = loc_switch_idxs[loc_switch_idxs >= loom_time_idx][0]
-    assert import_data['Arena'][shelter_start_idx-1] == 1
-    assert import_data['Arena'][shelter_start_idx] != 1
-   
+    shelt_start_idx = loc_switch_idxs[loc_switch_idxs >= loom_time_idx][0]
+    assert import_data['Arena'][shelt_start_idx-1] == 1
+    assert import_data['Arena'][shelt_start_idx] != 1
+    
+    shelt_enter_ts = import_data['Time'][shelt_start_idx]
+    shelt_exit_ts = get_next_switch_time(shelt_enter_ts)
+    shelt_duration = shelt_exit_ts - shelt_enter_ts
+    
+    # keep looping until a "time in shelter" event >= 1s occurs 
+    while shelt_duration < 1:
+        next_enter_ts = get_next_switch_time(shelt_exit_ts)
+        next_exit_ts = get_next_switch_time(next_enter_ts)
+        
+        # reset values
+        shelt_enter_ts = next_enter_ts
+        shelt_exit_ts = next_exit_ts
+        shelt_duration = shelt_exit_ts - shelt_enter_ts
+    
     # add values to lists
-    in_shelter_start_time = import_data['Time'][shelter_start_idx]
-    shelter_latency = in_shelter_start_time - timestamp
-   
+    shelter_latency = shelt_enter_ts - timestamp
+    
     if shelter_latency > 90:
         # exclude times where greater than 90s between loom and reaching the shelter
         in_shelter_start_times.append(float('nan'))
         shelter_latencies.append(float('nan'))
         warnings.warn(f'{int(shelter_latency)}s latency to shelter for loom #{int(loom_num)}. Values set to NaN.')
     else:
-        in_shelter_start_times.append(in_shelter_start_time)
-        shelter_latencies.append(in_shelter_start_time - timestamp)
-
+        in_shelter_start_times.append(shelt_enter_ts)
+        shelter_latencies.append(shelt_enter_ts - timestamp)
 
 for loom_num, shelter_ts in enumerate(in_shelter_start_times):
     # get first time mouse is detected in arena again
