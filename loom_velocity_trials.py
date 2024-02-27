@@ -37,7 +37,7 @@ for ts_num, ts in enumerate(import_data['Loom TS']):
             norm_time[ts_num].append(point - ts)
             velocity[ts_num].append(import_data['Velocity'][point_num])
             loom_vel[ts_num].append(import_data['Velocity'][point_num])
-        if point > ts + 15 and point <= ts + 25:
+        if point > ts + 15 and point <= ts + 30:
             norm_time[ts_num].append(point - ts)
             velocity[ts_num].append(import_data['Velocity'][point_num])
             post_vel[ts_num].append(import_data['Velocity'][point_num])
