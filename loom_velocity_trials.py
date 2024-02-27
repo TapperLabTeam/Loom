@@ -29,15 +29,15 @@ trial_dict = {name: [] for name in keynames}
 #Extract trial data based on looming timestamps
 for ts_num, ts in enumerate(import_data['Loom TS']):
     for point_num, point in enumerate(import_data['Time']):
-        if point >= (ts - 8) and point < ts:
+        if point >= (ts - 15) and point < ts:
             norm_time[ts_num].append(point - ts)
             velocity[ts_num].append(import_data['Velocity'][point_num])
             base_vel[ts_num].append(import_data['Velocity'][point_num])
-        if point >= ts and point <= ts + 8:
+        if point >= ts and point <= ts + 15:
             norm_time[ts_num].append(point - ts)
             velocity[ts_num].append(import_data['Velocity'][point_num])
             loom_vel[ts_num].append(import_data['Velocity'][point_num])
-        if point > ts + 8 and point <= ts + 18:
+        if point > ts + 15 and point <= ts + 25:
             norm_time[ts_num].append(point - ts)
             velocity[ts_num].append(import_data['Velocity'][point_num])
             post_vel[ts_num].append(import_data['Velocity'][point_num])
